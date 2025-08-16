@@ -22,6 +22,8 @@ class User extends Authenticatable
         'email',
         'password',
         'dashboard_metric',
+        'role',          // <-- ADICIONADO
+        'personal_id',   // <-- ADICIONADO
     ];
 
     /**
@@ -44,7 +46,8 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
-    // Relação: Um usuário pode ter muitos treinos
+    // --- RELAÇÕES EXISTENTES (PRESERVADAS) ---
+
     public function trainings()
     {
         return $this->hasMany(Training::class);
@@ -55,11 +58,39 @@ class User extends Authenticatable
         return $this->hasMany(Measurement::class);
     }
 
-    /**
-     * Relação: Um usuário pode ter muitos registros de treino finalizados.
-     */
     public function trainingLogs()
     {
         return $this->hasMany(TrainingLog::class);
+    }
+
+    // =========================================================================
+    // == NOVAS RELAÇÕES ADICIONADAS PARA PERSONAL / ALUNO ==
+    // =========================================================================
+
+    /**
+     * Relação: Um aluno pertence a um personal.
+     */
+    public function personal()
+    {
+        return $this->belongsTo(User::class, 'personal_id');
+    }
+
+    /**
+     * Relação: Um personal pode ter muitos alunos.
+     */
+    public function alunos()
+    {
+        return $this->hasMany(User::class, 'personal_id');
+    }
+
+    /**
+     * Check if the user has a specific role.
+     *
+     * @param string $role
+     * @return bool
+     */
+    public function hasRole(string $role): bool
+    {
+        return $this->role === $role;
     }
 }

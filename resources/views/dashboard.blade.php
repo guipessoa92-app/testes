@@ -15,7 +15,7 @@
                         @if ($nextTraining)
                             <div class="p-4 bg-gray-50 rounded-md">
                                 <p class="text-lg font-bold text-indigo-600">{{ $nextTraining->name }}</p>
-                                <p class="text-gray-600 mt-1">Dia: <span class="font-semibold">{{ ucfirst($nextTraining->day_of_week) }}</span></p>
+                                <p class="text-gray-600 mt-1">Dia: <span class="font-semibold">{{ ucfirst($nextTrainingDayName) }}</span></p>
                                 <a href="{{ route('trainings.show', $nextTraining) }}" class="mt-4 inline-block bg-indigo-500 text-white hover:bg-indigo-600 font-bold py-2 px-4 rounded transition duration-300">
                                     Iniciar Treino
                                 </a>

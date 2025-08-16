@@ -27,10 +27,7 @@
                                 <p class="font-bold">Peso:</p>
                                 <p>{{ $measurement->weight }} kg</p>
                             </div>
-                            <div class="bg-gray-100 p-4 rounded-md">
-                                <p class="font-bold">Idade:</p>
-                                <p>{{ $measurement->age }} anos</p>
-                            </div>
+                            
                             <div class="bg-gray-100 p-4 rounded-md">
                                 <p class="font-bold">Sexo:</p>
                                 <p>{{ $measurement->sex == 'male' ? 'Masculino' : 'Feminino' }}</p>

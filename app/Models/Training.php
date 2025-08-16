@@ -9,31 +9,33 @@ class Training extends Model
 {
     use HasFactory;
 
-    // Define os campos que podem ser preenchidos em massa
     protected $fillable = [
         'user_id',
         'name',
         'description',
-        'day_of_week',
+        // A coluna 'day_of_week' foi removida.
     ];
 
-    // Relação: Um treino pertence a um usuário
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    // Relação: Um treino tem muitos exercícios
     public function exercises()
     {
         return $this->hasMany(Exercise::class);
     }
 
-    /**
-     * Relação: Um treino pode ter muitos registros de conclusão (logs).
-     */
     public function logs()
     {
         return $this->hasMany(TrainingLog::class);
+    }
+
+    /**
+     * Relação Muitos-para-Muitos com os dias da semana.
+     */
+    public function daysOfWeek()
+    {
+        return $this->belongsToMany(DayOfWeek::class);
     }
 }

@@ -2,8 +2,8 @@
 
 namespace App\Providers;
 
-use App\Models\Training; // Importa o modelo Training
-use App\Policies\TrainingPolicy; // Importa a nova Policy
+use App\Models\Training;
+use App\Policies\TrainingPolicy;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 
 class AuthServiceProvider extends ServiceProvider
@@ -14,9 +14,6 @@ class AuthServiceProvider extends ServiceProvider
      * @var array<class-string, class-string>
      */
     protected $policies = [
-        // ===================================================================
-        // == REGISTRO DA NOVA POLICY DE TREINOS ADICIONADO AQUI ==
-        // ===================================================================
         Training::class => TrainingPolicy::class,
     ];
 

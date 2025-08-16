@@ -1,14 +1,20 @@
 <?php
 
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\FeedbackHistoryController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\MeasurementController;
+use App\Http\Controllers\PersonalController; // <-- ADICIONADO
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TrainingController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
-/* ... */
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+*/
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
@@ -22,6 +28,17 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::patch('/profile/preferences', [ProfileController::class, 'updatePreferences'])->name('profile.preferences.update');
+    Route::patch('/profile/link-personal', [ProfileController::class, 'linkPersonal'])->name('profile.linkPersonal');
+
+    Route::get('/historico-feedbacks', [FeedbackHistoryController::class, 'index'])->name('feedback.history');
+
+
+    // =========================================================================
+    // == NOVAS ROTAS PARA A ÁREA DO PERSONAL TRAINER ==
+    // =========================================================================
+    Route::middleware('role:personal')->prefix('personal')->name('personal.')->group(function () {
+        Route::get('/alunos', [PersonalController::class, 'index'])->name('students.index');
+    });
 
 
     // Rotas para o gerenciamento de Treinos
@@ -33,9 +50,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/treinos/{training}/editar', [TrainingController::class, 'edit'])->name('trainings.edit');
     Route::patch('/treinos/{training}', [TrainingController::class, 'update'])->name('trainings.update');
 
-    // =========================================================================
-    // == NOVAS ROTAS PARA O DIÁRIO DE TREINOS ==
-    // =========================================================================
+    // Rotas para o Diário de Treinos
     Route::post('/treinos/{training}/complete', [TrainingController::class, 'completeSession'])->name('trainings.completeSession');
     Route::get('/treinos/{training}/historico', [TrainingController::class, 'history'])->name('trainings.history');
 
@@ -46,19 +61,21 @@ Route::middleware('auth')->group(function () {
     Route::get('/treinos/{training}/exercicios/{exercise}/editar', [TrainingController::class, 'editExercise'])->name('exercises.edit');
     Route::patch('/treinos/{training}/exercicios/{exercise}', [TrainingController::class, 'updateExercise'])->name('exercises.update');
     Route::delete('/treinos/{training}/exercicios/{exercise}', [TrainingController::class, 'destroyExercise'])->name('exercises.destroy');
-    
-    // Rota antiga foi removida, pois não é mais necessária.
-    // Route::patch('/treinos/{training}/exercicios/{exercise}/complete', ...);
+    Route::patch('/treinos/{training}/exercicios/reorder', [TrainingController::class, 'reorderExercises'])->name('exercises.reorder');
 
 
     // Rotas para o gerenciamento de Medidas Corporais
     Route::get('/medidas', [MeasurementController::class, 'index'])->name('measurements.index');
     Route::get('/medidas/criar', [MeasurementController::class, 'create'])->name('measurements.create');
-    // ... (demais rotas de medidas)
+    Route::post('/medidas', [MeasurementController::class, 'store'])->name('measurements.store');
+    Route::get('/medidas/{measurement}', [MeasurementController::class, 'show'])->name('measurements.show');
+    Route::get('/medidas/{measurement}/editar', [MeasurementController::class, 'edit'])->name('measurements.edit');
+    Route::patch('/medidas/{measurement}', [MeasurementController::class, 'update'])->name('measurements.update');
+    Route::delete('/medidas/{measurement}', [MeasurementController::class, 'destroy'])->name('measurements.destroy');
 
-    // Nova rota para a página de progresso
+    // Rota para a página de progresso
     Route::get('/progresso', [MeasurementController::class, 'progress'])->name('measurements.progress');
     
-    });
+});
 
 require __DIR__.'/auth.php';

@@ -9,7 +9,7 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
-                    {{-- Voltar, Título e Descrição (inalterado) --}}
+                    {{-- Voltar, Título e Descrição (preservado) --}}
                     <div class="flex items-center mb-4">
                         <a href="{{ route('trainings.index') }}" class="inline-flex items-center px-4 py-2 bg-gray-200 border border-transparent rounded-md font-semibold text-xs text-gray-800 uppercase tracking-widest hover:bg-gray-300">
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
@@ -21,7 +21,7 @@
                         <p class="text-gray-600">{{ $training->description }}</p>
                     </div>
 
-                    {{-- Lista de Exercícios (agora mais simples) --}}
+                    {{-- Lista de Exercícios --}}
                     <div class="mt-8 border-t border-gray-200 pt-6">
                         <div class="flex justify-between items-center mb-4">
                             <h4 class="text-xl font-semibold">Exercícios</h4>
@@ -30,9 +30,12 @@
                                 Adicionar Exercício
                             </a>
                         </div>
-                        <div class="space-y-4 mt-4">
+                        
+                        <div x-data="sortableManager()" x-init="initSortable()" id="exercise-list" class="space-y-4 mt-4">
                             @forelse ($exercises as $exercise)
-                                <div class="p-4 bg-gray-100 rounded-md shadow-inner flex justify-between items-center">
+                                {{-- O atributo 'data-id' é usado pelo JS para saber o ID do exercício --}}
+                                {{-- A classe 'handle' e 'cursor-grab' indicam que o item pode ser arrastado --}}
+                                <div data-id="{{ $exercise->id }}" class="p-4 bg-gray-100 rounded-md shadow-inner flex justify-between items-center handle cursor-grab">
                                     <div>
                                         <h4 class="font-semibold text-lg">{{ $exercise->name }}</h4>
                                         <p class="text-gray-600">
@@ -54,6 +57,7 @@
                         </div>
                     </div>
 
+                    {{-- Seção de Finalizar Treino (preservada) --}}
                     <div x-data="{ open: false }" class="mt-8 border-t border-gray-200 pt-6">
                         <div class="flex justify-between items-center">
                             <h4 class="text-xl font-semibold">Finalizar Treino</h4>
@@ -82,4 +86,49 @@
             </div>
         </div>
     </div>
+    
+    @push('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    <script>
+        function sortableManager() {
+            return {
+                initSortable() {
+                    const exerciseList = document.getElementById('exercise-list');
+                    new Sortable(exerciseList, {
+                        animation: 150,
+                        handle: '.handle', // Define que o arrasto só funciona na área com a classe 'handle'
+                        onEnd: function (evt) {
+                            // Pega a nova ordem dos IDs dos exercícios
+                            const order = Array.from(evt.to.children).map(el => el.dataset.id);
+                            
+                            // Envia a nova ordem para o servidor de forma assíncrona
+                            fetch(`{{ route('exercises.reorder', $training) }}`, {
+                                method: 'PATCH',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                                },
+                                body: JSON.stringify({ order: order })
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                if(data.success) {
+                                    console.log('Ordem salva com sucesso!');
+                                    // Podemos adicionar uma notificação de sucesso aqui no futuro
+                                } else {
+                                    console.error('Falha ao salvar a ordem.');
+                                    alert('Ocorreu um erro ao salvar a nova ordem.');
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Erro:', error);
+                                alert('Ocorreu um erro de conexão.');
+                            });
+                        }
+                    });
+                }
+            }
+        }
+    </script>
+    @endpush
 </x-app-layout>

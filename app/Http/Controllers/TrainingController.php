@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\DayOfWeek;
 use App\Models\Exercise;
 use App\Models\Training;
-use App\Models\TrainingLog; // Importa o novo modelo
+use App\Models\TrainingLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
@@ -16,8 +17,7 @@ class TrainingController extends Controller
      */
     public function index()
     {
-        $trainings = Auth::user()->trainings()->latest()->get();
-
+        $trainings = Auth::user()->trainings()->with('daysOfWeek')->latest()->get();
         return view('trainings.index', compact('trainings'));
     }
 
@@ -26,7 +26,8 @@ class TrainingController extends Controller
      */
     public function create()
     {
-        return view('trainings.create');
+        $daysOfWeek = DayOfWeek::all();
+        return view('trainings.create', compact('daysOfWeek'));
     }
 
     /**
@@ -36,11 +37,16 @@ class TrainingController extends Controller
     {
         $validatedData = $request->validate([
             'name' => 'required|string|max:255',
-            'day_of_week' => 'nullable|string|max:255',
             'description' => 'nullable|string',
+            'days_of_week' => 'nullable|array',
+            'days_of_week.*' => 'exists:day_of_weeks,id'
         ]);
 
-        Auth::user()->trainings()->create($validatedData);
+        $training = Auth::user()->trainings()->create($validatedData);
+
+        if ($request->has('days_of_week')) {
+            $training->daysOfWeek()->attach($request->days_of_week);
+        }
 
         return redirect()->route('trainings.index')->with('success', 'Treino criado com sucesso!');
     }
@@ -67,8 +73,11 @@ class TrainingController extends Controller
         if ($training->user_id !== Auth::id()) {
             abort(403);
         }
+        
+        $daysOfWeek = DayOfWeek::all();
+        $training->load('daysOfWeek'); 
 
-        return view('trainings.edit', compact('training'));
+        return view('trainings.edit', compact('training', 'daysOfWeek'));
     }
 
     /**
@@ -82,11 +91,14 @@ class TrainingController extends Controller
 
         $validatedData = $request->validate([
             'name' => 'required|string|max:255',
-            'day_of_week' => 'nullable|string|max:255',
             'description' => 'nullable|string',
+            'days_of_week' => 'nullable|array',
+            'days_of_week.*' => 'exists:day_of_weeks,id'
         ]);
 
         $training->update($validatedData);
+
+        $training->daysOfWeek()->sync($request->days_of_week ?? []);
 
         return redirect()->route('trainings.index')->with('success', 'Treino atualizado com sucesso!');
     }
@@ -173,13 +185,31 @@ class TrainingController extends Controller
         return redirect()->route('trainings.show', $training)->with('success', 'Exercício excluído com sucesso!');
     }
 
-    // =========================================================================
-    // == NOVOS MÉTODOS PARA O DIÁRIO DE TREINOS ==
-    // =========================================================================
-
     /**
-     * Salva um novo registro de treino (sessão) com feedback opcional.
+     * Reorders the exercises for a given training.
      */
+    public function reorderExercises(Request $request, Training $training)
+    {
+        if ($training->user_id !== Auth::id()) {
+            return response()->json(['success' => false, 'message' => 'Não autorizado.'], 403);
+        }
+
+        $validated = $request->validate([
+            'order' => 'required|array',
+            'order.*' => 'integer|exists:exercises,id'
+        ]);
+
+        foreach ($validated['order'] as $index => $exerciseId) {
+            // Garante que a atualização seja feita apenas para exercícios deste treino, por segurança
+            $training->exercises()->where('id', $exerciseId)->update(['order' => $index + 1]);
+        }
+
+        return response()->json(['success' => true, 'message' => 'Ordem dos exercícios atualizada.']);
+    }
+
+
+    // --- Métodos para o Diário de Treinos ---
+
     public function completeSession(Request $request, Training $training)
     {
         if ($training->user_id !== Auth::id()) {
@@ -200,9 +230,6 @@ class TrainingController extends Controller
             ->with('success', 'Treino finalizado e salvo no seu histórico!');
     }
 
-    /**
-     * Mostra o histórico de sessões e feedbacks de um treino.
-     */
     public function history(Training $training)
     {
         if ($training->user_id !== Auth::id()) {

@@ -2,21 +2,34 @@
     <form method="POST" action="{{ route('register') }}">
         @csrf
 
-        <!-- Name -->
         <div>
             <x-input-label for="name" :value="__('Name')" />
             <x-text-input id="name" class="block mt-1 w-full" type="text" name="name" :value="old('name')" required autofocus autocomplete="name" />
             <x-input-error :messages="$errors->get('name')" class="mt-2" />
         </div>
 
-        <!-- Email Address -->
+        <div class="mt-4">
+            <x-input-label :value="__('Tipo de Conta')" />
+            <div class="mt-2 space-y-2">
+                <label for="role_aluno" class="inline-flex items-center">
+                    <input id="role_aluno" type="radio" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500" name="role" value="aluno" checked>
+                    <span class="ms-2 text-sm text-gray-600 dark:text-gray-400">{{ __('Sou Aluno') }}</span>
+                </label>
+                <br>
+                <label for="role_personal" class="inline-flex items-center">
+                    <input id="role_personal" type="radio" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500" name="role" value="personal" {{ old('role') === 'personal' ? 'checked' : '' }}>
+                    <span class="ms-2 text-sm text-gray-600 dark:text-gray-400">{{ __('Sou Personal Trainer') }}</span>
+                </label>
+            </div>
+            <x-input-error :messages="$errors->get('role')" class="mt-2" />
+        </div>
+
         <div class="mt-4">
             <x-input-label for="email" :value="__('Email')" />
             <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autocomplete="username" />
             <x-input-error :messages="$errors->get('email')" class="mt-2" />
         </div>
 
-        <!-- Password -->
         <div class="mt-4">
             <x-input-label for="password" :value="__('Password')" />
 
@@ -28,7 +41,6 @@
             <x-input-error :messages="$errors->get('password')" class="mt-2" />
         </div>
 
-        <!-- Confirm Password -->
         <div class="mt-4">
             <x-input-label for="password_confirmation" :value="__('Confirm Password')" />
 

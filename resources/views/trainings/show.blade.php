@@ -60,7 +60,9 @@
                     {{-- Seção de Finalizar Treino (preservada) --}}
                     <div x-data="{ open: false }" class="mt-8 border-t border-gray-200 pt-6">
                         <div class="flex justify-between items-center">
-                            <h4 class="text-xl font-semibold">Finalizar Treino</h4>
+                            <a href="{{ route('dashboard', ['training_completed' => true]) }}" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-xs font-semibold rounded-md hover:bg-blue-700">
+                                Finalizar Treino
+                            </a>
                             <div class="space-x-2">
                                 <a href="{{ route('trainings.history', $training) }}" class="inline-flex items-center px-4 py-2 bg-gray-500 text-white text-xs font-semibold rounded-md hover:bg-gray-600">Ver Histórico</a>
                                 <button @click="open = !open" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-xs font-semibold rounded-md hover:bg-blue-700">

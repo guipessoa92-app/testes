@@ -4,7 +4,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FeedbackHistoryController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\MeasurementController;
-use App\Http\Controllers\PersonalController; // <-- ADICIONADO
+use App\Http\Controllers\PersonalController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TrainingController;
 use Illuminate\Support\Facades\Auth;
@@ -33,11 +33,26 @@ Route::middleware('auth')->group(function () {
     Route::get('/historico-feedbacks', [FeedbackHistoryController::class, 'index'])->name('feedback.history');
 
 
-    // =========================================================================
-    // == NOVAS ROTAS PARA A ÁREA DO PERSONAL TRAINER ==
-    // =========================================================================
+    // Rotas para a Área do Personal Trainer
     Route::middleware('role:personal')->prefix('personal')->name('personal.')->group(function () {
         Route::get('/alunos', [PersonalController::class, 'index'])->name('students.index');
+        Route::get('/alunos/{aluno}/treinos', [PersonalController::class, 'showStudentTrainings'])->name('students.trainings');
+        
+        // =========================================================================
+        // == NOVAS ROTAS PARA O PERSONAL CRIAR TREINOS PARA O ALUNO ==
+        // =========================================================================
+        Route::get('/alunos/{aluno}/treinos/criar', [PersonalController::class, 'createStudentTraining'])->name('students.trainings.create');
+        Route::post('/alunos/{aluno}/treinos', [PersonalController::class, 'storeStudentTraining'])->name('students.trainings.store');
+
+        // =========================================================================
+        // == NOVAS ROTAS PARA O PERSONAL GERENCIAR EXERCÍCIOS DE UM ALUNO ==
+        // =========================================================================
+        Route::get('/alunos/{aluno}/treinos/{training}', [PersonalController::class, 'showStudentTrainingDetails'])->name('students.trainings.show');
+        Route::get('/alunos/{aluno}/treinos/{training}/exercicios/criar', [PersonalController::class, 'createStudentExercise'])->name('students.exercises.create');
+        Route::post('/alunos/{aluno}/treinos/{training}/exercicios', [PersonalController::class, 'storeStudentExercise'])->name('students.exercises.store');
+        Route::get('/alunos/{aluno}/treinos/{training}/exercicios/{exercise}/editar', [PersonalController::class, 'editStudentExercise'])->name('students.exercises.edit');
+        Route::patch('/alunos/{aluno}/treinos/{training}/exercicios/{exercise}', [PersonalController::class, 'updateStudentExercise'])->name('students.exercises.update');
+        Route::delete('/alunos/{aluno}/treinos/{training}/exercicios/{exercise}', [PersonalController::class, 'destroyStudentExercise'])->name('students.exercises.destroy');
     });
 
 

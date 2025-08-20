@@ -17,7 +17,8 @@
                                 <div class="p-4 border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300">
                                     <h4 class="text-lg font-semibold text-gray-800">{{ $aluno->name }}</h4>
                                     <p class="text-sm text-gray-500 mb-4">{{ $aluno->email }}</p>
-                                    <a href="#" class="inline-block bg-indigo-500 text-white hover:bg-indigo-600 font-bold py-2 px-4 rounded text-sm transition duration-300">
+                                    
+                                    <a href="{{ route('personal.students.trainings', ['aluno' => $aluno->id]) }}" class="inline-block bg-indigo-500 text-white hover:bg-indigo-600 font-bold py-2 px-4 rounded text-sm transition duration-300">
                                         Gerenciar Treinos
                                     </a>
                                 </div>

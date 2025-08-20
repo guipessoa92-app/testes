@@ -12,17 +12,21 @@ class DashboardController extends Controller
 {
     use ProvidesMeasurementOptions;
 
-    public function index()
+    public function index(Request $request)
     {
         $user = Auth::user();
         $measurementOptions = $this->getMeasurementOptions();
+        $trainingCompleted = $request->has('training_completed');
 
         // =========================================================================
         // == LÓGICA DO PRÓXIMO TREINO CORRIGIDA E MELHORADA ==
         // =========================================================================
         $nextTraining = null;
         $nextTrainingDayName = null; // <-- Variável para guardar o nome do dia
-        $todayId = Carbon::now()->dayOfWeekIso; // 1 = Segunda, 7 = Domingo
+        
+        // Se um treino foi finalizado, começamos a busca a partir de amanhã
+        $startDay = $trainingCompleted ? Carbon::now()->addDay() : Carbon::now();
+        $todayId = $startDay->dayOfWeekIso; // 1 = Segunda, 7 = Domingo
 
         $allTrainings = $user->trainings()->with('daysOfWeek')->get();
         $daysOfWeekMap = DayOfWeek::all()->keyBy('id'); // Mapeia IDs para nomes (ex: 1 => 'segunda')
@@ -38,6 +42,14 @@ class DashboardController extends Controller
                     break 2; // Sai dos dois loops
                 }
             }
+        }
+
+        // Lógica para a mensagem de "próximo treino"
+        $nextTrainingDayMessage = null;
+        if ($trainingCompleted && $nextTrainingDayName) {
+            $nextTrainingDayMessage = "Ótimo trabalho! Seu próximo treino, ". $nextTraining->name .", está agendado para ". ucfirst($nextTrainingDayName) . ".";
+        } elseif ($trainingCompleted) {
+            $nextTrainingDayMessage = "Treino concluído com sucesso! Você não tem treinos para os próximos dias.";
         }
 
         // Bloco 2: Lógica da Última Medição (Preservada)
@@ -80,6 +92,7 @@ class DashboardController extends Controller
             'chartLabels' => $chartLabels,
             'datasets' => $datasets,
             'chartTitle' => $metricConfig['label'],
+            'nextTrainingDayMessage' => $nextTrainingDayMessage, // <-- Envia a mensagem para a view
         ]);
     }
 }

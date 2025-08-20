@@ -9,12 +9,12 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-  public function up(): void
-{
-    Schema::table('exercises', function (Blueprint $table) {
-        $table->dropColumn(['completed_at', 'feedback']);
-    });
-}
+    public function up(): void
+    {
+        Schema::table('exercises', function (Blueprint $table) {
+            $table->string('rest_time')->nullable()->after('load');
+        });
+    }
 
     /**
      * Reverse the migrations.
@@ -22,7 +22,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('exercises', function (Blueprint $table) {
-            //
+            $table->dropColumn('rest_time');
         });
     }
 };

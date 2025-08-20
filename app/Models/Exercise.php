@@ -20,6 +20,7 @@ class Exercise extends Model
         'sets',
         'reps',
         'load',
+        'rest_time',
         'notes',
         'order',
     ];

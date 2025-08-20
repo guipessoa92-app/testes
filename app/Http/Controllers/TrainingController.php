@@ -226,8 +226,13 @@ class TrainingController extends Controller
             'completed_at' => Carbon::now(),
         ]);
 
+        $message = 'Treino finalizado e salvo no seu histórico!';
+        if (!empty($validated['feedback'])) {
+            $message .= ' Seu feedback foi registrado. Obrigado!';
+        }
+
         return redirect()->route('trainings.show', $training)
-            ->with('success', 'Treino finalizado e salvo no seu histórico!');
+            ->with('success', $message);
     }
 
     public function history(Training $training)

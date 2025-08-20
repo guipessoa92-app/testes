@@ -10,6 +10,13 @@
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
                 <div class="lg:col-span-2 space-y-6">
+                    @if (isset($nextTrainingDayMessage))
+                        <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6" role="alert">
+                            <p class="font-bold">Treino Finalizado!</p>
+                            <p>{{ $nextTrainingDayMessage }}</p>
+                        </div>
+                    @endif
+
                     <div class="bg-white p-6 rounded-lg shadow-md">
                         <h3 class="text-xl font-bold text-gray-900 mb-4">🗓️ Próximo Treino</h3>
                         @if ($nextTraining)

@@ -161,6 +161,8 @@ class MeasurementController extends Controller
             'calf_left' => 'Panturrilha Esquerda',
             'biceps_right_contracted' => 'Bíceps Direito (Contraído)',
             'biceps_right_relaxed' => 'Bíceps Direito (Relaxado)',
+            'biceps_left_contracted' => 'Bíceps Esquerdo (Contraído)',
+            'biceps_left_relaxed' => 'Bíceps Esquerdo (Relaxado)',
             'forearm_right' => 'Antebraço Direito',
             'forearm_left' => 'Antebraço Esquerdo',
         ];

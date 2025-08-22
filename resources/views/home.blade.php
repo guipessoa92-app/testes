@@ -60,9 +60,12 @@
                         Acompanhe seu progresso, registre suas medidas e organize seus treinos. Sua evolução começa agora.
                     </p>
                     
-                    <div class="mt-12">
+                    <div class="mt-12 flex flex-col items-center space-y-4">
                         <a href="{{ route('register') }}" class="bg-red-600 hover:bg-red-700 text-white font-bold py-4 px-10 rounded-lg text-xl uppercase tracking-wider transition-transform transform hover:scale-105">
                             Comece Agora
+                        </a>
+                        <a href="{{ route('login') }}" class="bg-red-600 hover:bg-red-700 text-white font-bold py-4 px-10 rounded-lg text-xl uppercase tracking-wider transition-transform transform hover:scale-105">
+                            Login
                         </a>
                     </div>
                 </div>
